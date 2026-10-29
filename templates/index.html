@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Kashmir Hotel Finder | Discover Your Stay</title>
+    <title>Kashmir Hotel Finder | Decision Tree</title>
+    <meta name="description" content="Find a hotel in Kashmir based on your travel preferences using a Decision Tree machine learning model.">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -77,10 +77,14 @@
         .hero {
             position: relative;
             overflow: hidden;
-            padding: 78px 7% 100px;
+            padding: 65px 7% 85px;
             color: white;
             background:
-                linear-gradient(110deg, rgba(13, 42, 34, .94), rgba(23, 63, 53, .80)),
+                linear-gradient(
+                    110deg,
+                    rgba(13, 42, 34, .94),
+                    rgba(23, 63, 53, .80)
+                ),
                 url("https://images.unsplash.com/photo-1566837497312-7be7830ae9b1?auto=format&fit=crop&w=1800&q=85");
             background-size: cover;
             background-position: center;
@@ -142,8 +146,101 @@
 
         .main-wrap {
             width: min(1080px, 90%);
-            margin: -36px auto 60px;
+            margin: -30px auto 60px;
             position: relative;
+        }
+
+        /* TOP AREA: ACCURACY AND PREDICTION */
+
+        .top-results {
+            display: grid;
+            grid-template-columns: 190px minmax(0, 1fr);
+            gap: 18px;
+            align-items: stretch;
+            margin-bottom: 24px;
+        }
+
+        .accuracy-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            padding: 20px 14px;
+            background: var(--forest);
+            color: white;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 8px 25px #173f3518;
+        }
+
+        .accuracy-number {
+            color: #e3c58f;
+            font-family: "Playfair Display", Georgia, serif;
+            font-size: 42px;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+
+        .accuracy-label {
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .top-prediction {
+            padding: 22px 26px;
+            background: #eff8f0;
+            border: 1px solid #b8d6c0;
+            border-radius: 15px;
+            overflow-wrap: anywhere;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .top-prediction .result-label {
+            color: #38734c;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .top-prediction h2 {
+            margin: 8px 0;
+        }
+
+        .hotel-name {
+            margin: 0 0 8px;
+            color: var(--forest);
+            font-size: 21px;
+            font-weight: 700;
+            line-height: 1.5;
+        }
+
+        .top-prediction .help-text {
+            margin: 0;
+        }
+
+        .prediction-placeholder {
+            padding: 22px 26px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .prediction-placeholder h2 {
+            margin: 0 0 8px;
+        }
+
+        .prediction-placeholder p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.7;
         }
 
         .trust-strip {
@@ -264,12 +361,6 @@
             font-size: 11px;
         }
 
-        .divider {
-            height: 1px;
-            margin: 32px 0;
-            background: var(--border);
-        }
-
         .advanced {
             margin-top: 28px;
             border: 1px solid var(--border);
@@ -343,34 +434,8 @@
             line-height: 1.7;
         }
 
-        .result {
-            margin-top: 26px;
-            padding: 26px;
-            border: 1px solid #b8d6c0;
-            border-radius: 14px;
-            background: #eff8f0;
-            overflow-wrap: anywhere;
-        }
-
-        .result .result-label {
-            color: #38734c;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .result h2 {
-            margin-top: 10px;
-        }
-
-        .result p {
-            margin-bottom: 0;
-            line-height: 1.7;
-        }
-
         .error {
-            margin-top: 24px;
+            margin-top: 18px;
             padding: 18px;
             color: #842c2c;
             background: #fff0ef;
@@ -399,7 +464,7 @@
             }
 
             .hero {
-                padding: 65px 6% 78px;
+                padding: 55px 6% 75px;
             }
 
             .hero p {
@@ -409,6 +474,24 @@
             .main-wrap {
                 width: 92%;
                 margin-top: -24px;
+            }
+
+            .top-results {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .accuracy-card {
+                padding: 16px;
+            }
+
+            .accuracy-number {
+                font-size: 36px;
+            }
+
+            .top-prediction,
+            .prediction-placeholder {
+                padding: 20px;
             }
 
             .trust-strip {
@@ -465,6 +548,46 @@
 </header>
 
 <main class="main-wrap">
+
+    <!-- ACCURACY AND PREDICTION ARE AT THE TOP -->
+
+    <section class="top-results" aria-live="polite">
+
+        <div class="accuracy-card">
+            <span class="accuracy-number">62%</span>
+            <span class="accuracy-label">Decision Tree<br>Model Accuracy</span>
+        </div>
+
+        {% if prediction %}
+        <div class="top-prediction">
+            <div class="result-label">✦ Your Decision Tree prediction</div>
+            <h2>Recommended Hotel</h2>
+            <p class="hotel-name">{{ prediction }}</p>
+            <p class="help-text">
+                Please verify current prices, location, availability and
+                amenities before making a booking.
+            </p>
+        </div>
+        {% else %}
+        <div class="prediction-placeholder">
+            <h2>Your hotel recommendation</h2>
+            <p>
+                Enter your travel preferences in the form below and click
+                "Find My Recommended Hotel". Your model's prediction will
+                appear here at the top of the page.
+            </p>
+        </div>
+        {% endif %}
+
+    </section>
+
+    {% if error %}
+    <section class="error" aria-live="assertive">
+        <strong>We couldn't generate your recommendation.</strong>
+        <p>{{ error }}</p>
+        <p>Please check your inputs and try again.</p>
+    </section>
+    {% endif %}
 
     <section class="trust-strip">
         <div class="trust-item">
@@ -636,6 +759,7 @@
 
             <details class="advanced">
                 <summary>⚙ Advanced Details — optional for editing</summary>
+
                 <div class="advanced-content">
                     <p class="help-text">
                         These fields are required by the current model input format.
@@ -644,110 +768,145 @@
                     </p>
 
                     <h3>Budget and room information</h3>
+
                     <div class="form-grid">
+
                         <div class="field">
                             <label for="user_daily_budget_inr">Daily budget (₹)</label>
                             <input type="number" name="user_daily_budget_inr"
-                                   id="user_daily_budget_inr" value="5000" step="any" required>
+                                   id="user_daily_budget_inr" value="5000"
+                                   step="any" required>
                         </div>
+
                         <div class="field">
                             <label for="base_price_per_night_inr">Base nightly price (₹)</label>
                             <input type="number" name="base_price_per_night_inr"
-                                   id="base_price_per_night_inr" value="4000" step="any" required>
+                                   id="base_price_per_night_inr" value="4000"
+                                   step="any" required>
                         </div>
+
                         <div class="field">
                             <label for="seasonal_room_rate_inr">Seasonal room rate (₹)</label>
                             <input type="number" name="seasonal_room_rate_inr"
-                                   id="seasonal_room_rate_inr" value="4500" step="any" required>
+                                   id="seasonal_room_rate_inr" value="4500"
+                                   step="any" required>
                         </div>
+
                         <div class="field">
                             <label for="estimated_total_stay_cost_inr">Estimated stay cost (₹)</label>
                             <input type="number" name="estimated_total_stay_cost_inr"
-                                   id="estimated_total_stay_cost_inr" value="22500" step="any" required>
+                                   id="estimated_total_stay_cost_inr" value="22500"
+                                   step="any" required>
                         </div>
+
                         <div class="field">
                             <label for="budget_fit_ratio">Budget fit ratio</label>
                             <input type="number" name="budget_fit_ratio"
-                                   id="budget_fit_ratio" value="0.75" step="any" required>
+                                   id="budget_fit_ratio" value="0.75"
+                                   step="any" required>
                         </div>
+
                         <div class="field">
                             <label for="max_guests_per_room">Max guests per room</label>
                             <input type="number" name="max_guests_per_room"
-                                   id="max_guests_per_room" value="3" step="any" required>
+                                   id="max_guests_per_room" value="3"
+                                   step="any" required>
                         </div>
+
                     </div>
 
                     <h3>Hotel details</h3>
+
                     <div class="form-grid">
+
                         <div class="field">
                             <label for="star_category">Star category</label>
-                            <input type="number" name="star_category" id="star_category"
-                                   value="3" step="any" required>
+                            <input type="number" name="star_category"
+                                   id="star_category" value="3"
+                                   step="any" required>
                         </div>
+
                         <div class="field">
                             <label for="google_rating">Google rating</label>
-                            <input type="number" name="google_rating" id="google_rating"
-                                   value="4.2" min="0" max="5" step="any" required>
+                            <input type="number" name="google_rating"
+                                   id="google_rating" value="4.2"
+                                   min="0" max="5" step="any" required>
                         </div>
+
                         <div class="field">
                             <label for="review_count">Review count</label>
-                            <input type="number" name="review_count" id="review_count"
-                                   value="250" min="0" step="1" required>
+                            <input type="number" name="review_count"
+                                   id="review_count" value="250"
+                                   min="0" step="1" required>
                         </div>
+
                         <div class="field">
                             <label for="has_central_heating_bukhari">Heating available (0/1)</label>
                             <input type="number" name="has_central_heating_bukhari"
                                    id="has_central_heating_bukhari" value="1"
                                    min="0" max="1" step="1" required>
                         </div>
+
                         <div class="field">
                             <label for="has_power_backup_24x7">24/7 power backup (0/1)</label>
                             <input type="number" name="has_power_backup_24x7"
                                    id="has_power_backup_24x7" value="1"
                                    min="0" max="1" step="1" required>
                         </div>
+
                         <div class="field">
                             <label for="has_mountain_or_lake_view">Mountain/lake view (0/1)</label>
                             <input type="number" name="has_mountain_or_lake_view"
                                    id="has_mountain_or_lake_view" value="1"
                                    min="0" max="1" step="1" required>
                         </div>
+
                         <div class="field">
                             <label for="has_wazwan_kitchen">Wazwan kitchen (0/1)</label>
                             <input type="number" name="has_wazwan_kitchen"
                                    id="has_wazwan_kitchen" value="1"
                                    min="0" max="1" step="1" required>
                         </div>
+
                         <div class="field">
                             <label for="distance_to_sxr_airport_km">Airport distance (km)</label>
                             <input type="number" name="distance_to_sxr_airport_km"
-                                   id="distance_to_sxr_airport_km" value="15" step="any" required>
+                                   id="distance_to_sxr_airport_km" value="15"
+                                   step="any" required>
                         </div>
+
                         <div class="field">
                             <label for="distance_to_landmark_km">Landmark distance (km)</label>
                             <input type="number" name="distance_to_landmark_km"
-                                   id="distance_to_landmark_km" value="3" step="any" required>
+                                   id="distance_to_landmark_km" value="3"
+                                   step="any" required>
                         </div>
+
                         <div class="field">
                             <label for="latitude">Latitude</label>
                             <input type="number" name="latitude" id="latitude"
                                    value="34.0837" step="any" required>
                         </div>
+
                         <div class="field">
                             <label for="longitude">Longitude</label>
                             <input type="number" name="longitude" id="longitude"
                                    value="74.7973" step="any" required>
                         </div>
+
                         <div class="field">
                             <label for="altitude_m">Altitude (m)</label>
                             <input type="number" name="altitude_m" id="altitude_m"
                                    value="1585" step="any" required>
                         </div>
+
                         <div class="field">
                             <label for="suitability_score">Suitability score</label>
                             <input type="number" name="suitability_score"
-                                   id="suitability_score" value="0.85" step="any" required>
+                                   id="suitability_score" value="0.85"
+                                   step="any" required>
                         </div>
+
                     </div>
                 </div>
             </details>
@@ -758,33 +917,14 @@
             </button>
 
             <p class="privacy-note">
-                Your preferences are processed by the local recommendation app.
+                Your preferences are processed by the hotel recommendation app.
                 Results depend on your trained model and its input data.
             </p>
 
         </form>
 
-        {% if prediction %}
-        <section class="result" aria-live="polite">
-            <div class="result-label">✦ Your model's prediction</div>
-            <h2>Recommended Hotel</h2>
-            <p>{{ prediction }}</p>
-            <p class="help-text">
-                Please verify current prices, location, availability, and
-                amenities before making a booking.
-            </p>
-        </section>
-        {% endif %}
-
-        {% if error %}
-        <section class="error" aria-live="polite">
-            <strong>We couldn't generate your recommendation.</strong>
-            <p>{{ error }}</p>
-            <p>Please check the inputs and try again.</p>
-        </section>
-        {% endif %}
-
     </section>
+
 </main>
 
 <footer class="footer">
@@ -798,22 +938,36 @@
     const submitButton = document.getElementById("submit-button");
 
     form.addEventListener("submit", function (event) {
-        const adults = Number(document.getElementById("adults_count").value);
-        const children = Number(document.getElementById("children_count").value);
-        const seniors = Number(document.getElementById("seniors_count").value);
-        const travellers = Number(document.getElementById("family_count").value);
+        const adults = Number(
+            document.getElementById("adults_count").value
+        );
+
+        const children = Number(
+            document.getElementById("children_count").value
+        );
+
+        const seniors = Number(
+            document.getElementById("seniors_count").value
+        );
+
+        const travellers = Number(
+            document.getElementById("family_count").value
+        );
 
         if (adults + children + seniors !== travellers) {
             event.preventDefault();
+
             alert(
                 "Please make sure Adults + Children + Senior travellers " +
                 "equals the Number of travellers."
             );
+
             return;
         }
 
         submitButton.disabled = true;
-        submitButton.querySelector("span").textContent = "Finding your recommendation...";
+        submitButton.querySelector("span").textContent =
+            "Finding your recommendation...";
     });
 </script>
 

@@ -6,17 +6,21 @@ from pathlib import Path
 
 app = Flask(__name__)
 
-# Locate the saved model files in this project folder
+# Find model files in the same folder as app.py
 BASE_DIR = Path(__file__).resolve().parent
 
+# Load the trained Decision Tree model
 with open(BASE_DIR / "decision_tree.pkl", "rb") as file:
     model = pickle.load(file)
 
+# Load the saved OneHotEncoder
 with open(BASE_DIR / "ohe.pkl", "rb") as file:
     ohe = pickle.load(file)
 
+# Accuracy reported from the Kaggle evaluation
+MODEL_ACCURACY = 62
 
-# Keep this order exactly the same as in the Kaggle notebook
+# Keep the feature order identical to the Kaggle notebook
 NUMERIC_FIELDS = [
     "user_budget_total_inr",
     "user_daily_budget_inr",
@@ -48,7 +52,6 @@ NUMERIC_FIELDS = [
     "suitability_score"
 ]
 
-# Keep this order exactly the same as the Kaggle OneHotEncoder
 CATEGORICAL_FIELDS = [
     "travel_season",
     "trip_purpose",
@@ -61,55 +64,69 @@ CATEGORICAL_FIELDS = [
 
 @app.route("/")
 def home():
-    return render_template("index.html")
+    return render_template(
+        "index.html",
+        accuracy=MODEL_ACCURACY
+    )
 
 
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
-        # Read the 28 numeric values in the trained feature order
+        # Read numeric inputs in the required order
         numeric_values = [
             float(request.form[field])
             for field in NUMERIC_FIELDS
         ]
 
-        # Read the 6 categorical values in the encoder's feature order
+        numeric_array = np.array(
+            numeric_values,
+            dtype=float
+        ).reshape(1, -1)
+
+        # Read categorical inputs in the required order
         categorical_values = [
             request.form[field]
             for field in CATEGORICAL_FIELDS
         ]
 
-        numeric_array = np.array(
-            numeric_values, dtype=float
-        ).reshape(1, -1)
-
+        # Apply the saved OneHotEncoder
         encoded = ohe.transform([categorical_values])
 
-        # Support both sparse and dense OneHotEncoder outputs
+        # Convert sparse output to a dense array if necessary
         if hasattr(encoded, "toarray"):
             encoded = encoded.toarray()
 
-        # Kaggle training order: numeric features first, encoded features second
+        # Combine numeric and encoded categorical features
         final_input = np.hstack((numeric_array, encoded))
 
-        # The trained model expects 65 features
+        # Verify that the model receives 65 features
         if final_input.shape[1] != 65:
             raise ValueError(
-                f"Expected 65 features, received {final_input.shape[1]}."
+                f"Model expects 65 features, but received "
+                f"{final_input.shape[1]}. Check the Kaggle "
+                f"feature order and encoder."
             )
 
+        # Predict the recommended hotel/class
         prediction = model.predict(final_input)[0]
 
         return render_template(
             "index.html",
-            prediction=str(prediction)
+            prediction=str(prediction),
+            accuracy=MODEL_ACCURACY
         )
 
-    except Exception as error:
+    except Exception:
         app.logger.exception("Prediction failed")
+
         return render_template(
             "index.html",
-            error=f"Prediction failed: {error}"
+            error=(
+                "Prediction failed. Please check your inputs "
+                "and confirm that the model and encoder match."
+            ),
+            accuracy=MODEL_ACCURACY
         ), 400
 
 
